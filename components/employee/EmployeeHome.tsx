@@ -144,158 +144,106 @@ export function EmployeeHome({
           </form>
         </Card>
 
-        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(380px,0.65fr)] xl:gap-6">
-          <Card>
-            <CardHeader title={`Customers (${rows.length})`} />
-            <div className="divide-y divide-calm-200 md:hidden">
-              {rows.length ? (
-                rows.map((customer) => (
-                  <article className="space-y-3 p-4" key={customer.id}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate font-bold text-calm-900">{customer.customerName}</p>
-                        <p className="mt-1 text-sm font-medium text-calm-500">{customer.mobile}</p>
-                      </div>
-                      <span className="shrink-0 rounded-md bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
-                        {customer.product}
-                      </span>
+        <Card>
+          <CardHeader title={`Lead Workboard (${rows.length})`} />
+          <div className="divide-y divide-calm-200 md:hidden">
+            {rows.length ? (
+              rows.map((customer) => (
+                <article className="space-y-4 p-4" key={customer.id}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-bold text-calm-900">{customer.customerName}</p>
+                      <p className="mt-1 text-sm font-medium text-calm-500">{customer.mobile}</p>
                     </div>
-                    <p className="text-sm font-medium text-calm-600">Added {formatDate(customer.date)}</p>
-                  </article>
-                ))
-              ) : (
-                <EmptyMobile message="No customers match the selected filters." />
-              )}
-            </div>
-            <div className="hidden overflow-x-auto md:block">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Mobile</th>
-                    <th>Product</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.length ? (
-                    rows.map((customer) => (
-                      <tr key={customer.id}>
-                        <td className="font-semibold text-calm-900">{customer.customerName}</td>
-                        <td className="text-calm-600">{customer.mobile}</td>
-                        <td className="text-calm-600">{customer.product}</td>
-                        <td className="text-calm-600">{formatDate(customer.date)}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td className="text-sm text-calm-500" colSpan={4}>
-                        No customers match the selected filters.
+                    <Badge value={customer.leadProcess.status} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <LeadDetail label="Product" value={customer.product} />
+                    <LeadDetail label="Added" value={formatDate(customer.date)} />
+                    <LeadDetail label="Income" value={formatCurrency(customer.leadProcess.income)} />
+                    <LeadDetail
+                      label="Complete"
+                      value={customer.leadProcess.status === "COMPLETED" ? "Yes" : "No"}
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between text-xs font-bold text-calm-500">
+                      <span>Work Progress</span>
+                      <span>{customer.leadProcess.progress}%</span>
+                    </div>
+                    <div className="mt-2 h-2 rounded-full bg-calm-100">
+                      <div
+                        className="h-2 rounded-full bg-brand-500 transition-[width] duration-300"
+                        style={{ width: `${customer.leadProcess.progress}%` }}
+                      />
+                    </div>
+                  </div>
+                  {customer.leadProcess.rejectionReason ? (
+                    <p className="rounded-md bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
+                      {customer.leadProcess.rejectionReason}
+                    </p>
+                  ) : null}
+                </article>
+              ))
+            ) : (
+              <EmptyMobile message="No customers match the selected filters." />
+            )}
+          </div>
+          <div className="hidden overflow-x-auto md:block">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Mobile</th>
+                  <th>Product</th>
+                  <th>Added</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th>Income</th>
+                  <th>Rejection Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.length ? (
+                  rows.map((customer) => (
+                    <tr key={customer.id}>
+                      <td className="font-semibold text-calm-900">{customer.customerName}</td>
+                      <td className="text-calm-600">{customer.mobile}</td>
+                      <td className="text-calm-600">{customer.product}</td>
+                      <td className="whitespace-nowrap text-calm-600">{formatDate(customer.date)}</td>
+                      <td>
+                        <Badge value={customer.leadProcess.status} />
+                      </td>
+                      <td className="min-w-36">
+                        <div className="h-2 rounded-full bg-calm-100">
+                          <div
+                            className="h-2 rounded-full bg-brand-500"
+                            style={{ width: `${customer.leadProcess.progress}%` }}
+                          />
+                        </div>
+                        <span className="mt-1 block text-xs font-semibold text-calm-500">
+                          {customer.leadProcess.progress}%
+                        </span>
+                      </td>
+                      <td className="whitespace-nowrap text-sm font-semibold text-calm-900">
+                        {formatCurrency(customer.leadProcess.income)}
+                      </td>
+                      <td className="min-w-52 text-sm text-calm-600">
+                        {customer.leadProcess.rejectionReason ?? "-"}
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-
-          <Card>
-            <CardHeader title="Work Process" />
-            <div className="divide-y divide-calm-200 md:hidden">
-              {rows.length ? (
-                rows.map((customer) => (
-                  <article className="space-y-3 p-4" key={customer.id}>
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="min-w-0 truncate font-bold text-calm-900">{customer.customerName}</p>
-                      <Badge value={customer.leadProcess.status} />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between text-xs font-bold text-calm-500">
-                        <span>Progress</span>
-                        <span>{customer.leadProcess.progress}%</span>
-                      </div>
-                      <div className="mt-2 h-2 rounded-full bg-calm-100">
-                        <div
-                          className="h-2 rounded-full bg-brand-500 transition-[width] duration-300"
-                          style={{ width: `${customer.leadProcess.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <p className="text-xs font-bold uppercase text-calm-500">Income</p>
-                        <p className="mt-1 font-bold text-calm-900">{formatCurrency(customer.leadProcess.income)}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold uppercase text-calm-500">Complete</p>
-                        <p className="mt-1 font-bold text-calm-900">
-                          {customer.leadProcess.status === "COMPLETED" ? "Yes" : "No"}
-                        </p>
-                      </div>
-                    </div>
-                    {customer.leadProcess.rejectionReason ? (
-                      <p className="rounded-md bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
-                        {customer.leadProcess.rejectionReason}
-                      </p>
-                    ) : null}
-                  </article>
-                ))
-              ) : (
-                <EmptyMobile message="Work status appears after a customer is added." />
-              )}
-            </div>
-            <div className="hidden overflow-x-auto md:block">
-              <table>
-                <thead>
+                  ))
+                ) : (
                   <tr>
-                    <th>Lead Status</th>
-                    <th>Progress</th>
-                    <th>Complete</th>
-                    <th>Income</th>
-                    <th>Rejection Reason</th>
+                    <td className="text-sm text-calm-500" colSpan={8}>
+                      No customers match the selected filters.
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {rows.length ? (
-                    rows.map((customer) => (
-                      <tr key={customer.id}>
-                        <td>
-                          <Badge value={customer.leadProcess.status} />
-                        </td>
-                        <td className="min-w-32">
-                          <div className="h-2 rounded-full bg-calm-100">
-                            <div
-                              className="h-2 rounded-full bg-brand-500"
-                              style={{ width: `${customer.leadProcess.progress}%` }}
-                            />
-                          </div>
-                          <span className="mt-1 block text-xs font-semibold text-calm-500">
-                            {customer.leadProcess.progress}%
-                          </span>
-                        </td>
-                        <td className="text-sm font-semibold text-calm-700">
-                          {customer.leadProcess.status === "COMPLETED" ? "Yes" : "No"}
-                        </td>
-                        <td className="text-sm font-semibold text-calm-900">
-                          {formatCurrency(customer.leadProcess.income)}
-                        </td>
-                        <td className="min-w-48 text-sm text-calm-600">
-                          {customer.leadProcess.rejectionReason ?? "-"}
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td className="text-sm text-calm-500" colSpan={5}>
-                        Work status appears after a customer is added.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        </div>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       </main>
 
       <Button
@@ -366,4 +314,13 @@ function LeadMetric({
 
 function EmptyMobile({ message }: { message: string }) {
   return <p className="p-4 text-sm font-medium text-calm-500">{message}</p>;
+}
+
+function LeadDetail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs font-bold uppercase text-calm-500">{label}</p>
+      <p className="mt-1 truncate font-semibold text-calm-900">{value}</p>
+    </div>
+  );
 }

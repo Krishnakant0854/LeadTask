@@ -89,7 +89,12 @@ export function EmployeeHome({
     const data = (await response.json()) as { customer: CustomerRow };
     setRows((current) => [data.customer, ...current]);
     setModalOpen(false);
-    router.refresh();
+
+    // The optimistic row is already current. Refetch only when an active filter
+    // could exclude the newly created customer from this view.
+    if (["name", "product", "date"].some((key) => searchParams.get(key))) {
+      router.refresh();
+    }
   }
 
   return (

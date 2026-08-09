@@ -44,7 +44,6 @@ export function AdminShell({
     setBusy(true);
     await csrfFetch("/api/auth/logout", { method: "POST" }).catch(() => null);
     router.push("/login");
-    router.refresh();
   }
 
   return (

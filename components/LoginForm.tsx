@@ -41,7 +41,6 @@ export function LoginForm() {
 
     const data = (await response.json()) as { redirectTo: string };
     router.push(searchParams.get("next") ?? data.redirectTo);
-    router.refresh();
   }
 
   return (

@@ -14,11 +14,12 @@ export async function POST(request: Request) {
   try {
     assertCsrf(request);
     const body = loginSchema.parse(await request.json());
-    await assertLoginAllowed(body.employeeId, request);
-
-    const user = await prisma.user.findUnique({
-      where: { employeeId: body.employeeId }
-    });
+    const [, user] = await Promise.all([
+      assertLoginAllowed(body.employeeId, request),
+      prisma.user.findUnique({
+        where: { employeeId: body.employeeId }
+      })
+    ]);
 
     const nameMatches = user?.name.trim().toLowerCase() === body.name.trim().toLowerCase();
     const passwordMatches = user
@@ -30,8 +31,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid login details" }, { status: 401 });
     }
 
-    await clearFailedLogins(body.employeeId, request);
-    await createSession(user.id);
+    await Promise.all([
+      createSession(user.id),
+      // A stale lockout record must not prevent an otherwise valid sign-in.
+      clearFailedLogins(body.employeeId, request).catch(() => undefined)
+    ]);
 
     return NextResponse.json({
       user: {

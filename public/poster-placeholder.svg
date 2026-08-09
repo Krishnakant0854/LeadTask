@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" role="img" aria-label="Lead management poster">
+  <rect width="1400" height="420" fill="#eef7ff"/>
+  <path d="M0 310c150-64 268-42 398 4 156 56 287 69 445-11 136-69 280-91 557-16v133H0z" fill="#d8edff"/>
+  <circle cx="1180" cy="110" r="72" fill="#bfdbfe"/>
+  <rect x="86" y="78" width="430" height="62" rx="12" fill="#ffffff"/>
+  <rect x="86" y="166" width="610" height="24" rx="12" fill="#bfdbfe"/>
+  <rect x="86" y="210" width="520" height="24" rx="12" fill="#cbd5e1"/>
+  <rect x="86" y="270" width="190" height="48" rx="10" fill="#2563eb"/>
+  <rect x="825" y="92" width="302" height="220" rx="22" fill="#ffffff"/>
+  <rect x="863" y="132" width="226" height="22" rx="11" fill="#bfdbfe"/>
+  <rect x="863" y="182" width="168" height="18" rx="9" fill="#d1fae5"/>
+  <rect x="863" y="226" width="210" height="18" rx="9" fill="#e2e8f0"/>
+  <rect x="863" y="270" width="142" height="18" rx="9" fill="#e2e8f0"/>
+</svg>

@@ -267,7 +267,6 @@ export function AdminUsersManager({ initialUsers }: { initialUsers: AdminUserRow
                 minLength={12}
                 name="password"
                 required
-                type="password"
               />
             </Field>
           ) : null}

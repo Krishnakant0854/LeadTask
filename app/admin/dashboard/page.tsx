@@ -48,12 +48,12 @@ export default async function AdminDashboardPage() {
         <p className="mt-1 text-sm font-medium text-calm-500">Live overview of employees, customers, leads, and income.</p>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <section className="grid gap-3 sm:grid-cols-2 lg:gap-4 xl:grid-cols-3 2xl:grid-cols-4">
         {stats.map((item) => (
           <Link key={item.label} href={item.href}>
-            <Card className="p-5 transition hover:border-brand-100 hover:shadow-soft">
+            <Card className="p-4 transition duration-150 hover:border-brand-100 hover:shadow-soft sm:p-5">
               <p className="text-sm font-bold text-calm-500">{item.label}</p>
-              <p className="mt-2 text-3xl font-black text-calm-900">{item.value}</p>
+              <p className="mt-2 truncate text-2xl font-black text-calm-900 sm:text-3xl">{item.value}</p>
             </Card>
           </Link>
         ))}

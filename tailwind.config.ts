@@ -26,7 +26,8 @@ const config: Config = {
         }
       },
       boxShadow: {
-        soft: "0 16px 40px rgba(15, 23, 42, 0.08)"
+        soft: "0 16px 40px rgba(15, 23, 42, 0.08)",
+        panel: "0 10px 28px rgba(15, 23, 42, 0.06)"
       }
     }
   },

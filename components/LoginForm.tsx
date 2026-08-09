@@ -1,6 +1,6 @@
 "use client";
 
-import { LockKeyhole, UserCheck } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole, UserCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -13,6 +13,7 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,13 +64,26 @@ export function LoginForm() {
         <Input autoComplete="name" name="name" placeholder="Rahul Sharma" required />
       </Field>
       <Field label="Password">
-        <Input
-          autoComplete="current-password"
-          name="password"
-          placeholder="Enter password"
-          required
-          type="password"
-        />
+        <div className="relative">
+          <Input
+            autoComplete="current-password"
+            className="pr-12"
+            name="password"
+            placeholder="Enter password"
+            required
+            type={passwordVisible ? "text" : "password"}
+          />
+          <Button
+            aria-label={passwordVisible ? "Hide password" : "Show password"}
+            className="absolute right-0 top-0 h-11 w-11 px-0"
+            type="button"
+            title={passwordVisible ? "Hide password" : "Show password"}
+            variant="ghost"
+            onClick={() => setPasswordVisible((current) => !current)}
+          >
+            {passwordVisible ? <EyeOff size={19} /> : <Eye size={19} />}
+          </Button>
+        </div>
       </Field>
 
       {error ? (

@@ -8,7 +8,7 @@ export function Card({
   children: React.ReactNode;
 }) {
   return (
-    <section className={cn("rounded-lg border border-calm-200 bg-white shadow-sm", className)}>
+    <section className={cn("overflow-hidden rounded-lg border border-calm-200 bg-white shadow-panel", className)}>
       {children}
     </section>
   );
@@ -22,9 +22,9 @@ export function CardHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-calm-200 px-5 py-4">
+    <div className="flex flex-col gap-3 border-b border-calm-200 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
       <h2 className="text-base font-bold text-calm-900">{title}</h2>
-      {action}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
 }

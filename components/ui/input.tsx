@@ -14,7 +14,7 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
   return (
     <input
       className={cn(
-        "focus-ring h-10 w-full rounded-md border border-calm-200 bg-white px-3 text-sm text-calm-900 placeholder:text-calm-500",
+        "focus-ring h-11 w-full rounded-md border border-calm-200 bg-white px-3 text-sm text-calm-900 placeholder:text-calm-500 transition hover:border-calm-300 focus:border-brand-500",
         className
       )}
       ref={ref}
@@ -27,7 +27,7 @@ export function Select({ className, ...props }: SelectHTMLAttributes<HTMLSelectE
   return (
     <select
       className={cn(
-        "focus-ring h-10 w-full rounded-md border border-calm-200 bg-white px-3 text-sm text-calm-900",
+        "focus-ring h-11 w-full rounded-md border border-calm-200 bg-white px-3 text-sm text-calm-900 transition placeholder:text-calm-500 hover:border-calm-300 focus:border-brand-500",
         className
       )}
       {...props}
@@ -39,7 +39,7 @@ export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTex
   return (
     <textarea
       className={cn(
-        "focus-ring min-h-24 w-full rounded-md border border-calm-200 bg-white px-3 py-2 text-sm text-calm-900 placeholder:text-calm-500",
+        "focus-ring min-h-28 w-full rounded-md border border-calm-200 bg-white px-3 py-2.5 text-sm text-calm-900 placeholder:text-calm-500 transition hover:border-calm-300 focus:border-brand-500",
         className
       )}
       {...props}

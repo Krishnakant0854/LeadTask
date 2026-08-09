@@ -18,13 +18,13 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4">
-      <div className="w-full max-w-xl rounded-lg bg-white shadow-soft">
-        <div className="flex items-center justify-between border-b border-calm-200 px-5 py-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-3 sm:p-5">
+      <div className="flex max-h-[calc(100dvh-1.5rem)] w-full max-w-xl flex-col overflow-hidden rounded-lg bg-white shadow-soft sm:max-h-[calc(100dvh-2.5rem)]">
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-calm-200 px-4 py-3 sm:px-5 sm:py-4">
           <h2 className="text-base font-bold text-calm-900">{title}</h2>
           <Button
             aria-label="Close"
-            className="h-9 w-9 px-0"
+            className="h-10 w-10 px-0"
             type="button"
             variant="ghost"
             onClick={onClose}
@@ -32,7 +32,7 @@ export function Modal({
             <X size={18} />
           </Button>
         </div>
-        <div className="p-5">{children}</div>
+        <div className="min-h-0 overflow-y-auto p-4 sm:p-5">{children}</div>
       </div>
     </div>
   );

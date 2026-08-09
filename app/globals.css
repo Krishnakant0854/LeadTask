@@ -6,14 +6,22 @@
   color-scheme: light;
 }
 
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #f8fafc;
+  min-height: 100vh;
+  background: #f4f7fb;
   color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 button,
@@ -21,6 +29,18 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type="checkbox"] {
+  accent-color: #2563eb;
 }
 
 table {
@@ -31,11 +51,12 @@ table {
 
 th {
   text-align: left;
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0;
-  color: #64748b;
+  color: #475569;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 td,
@@ -43,6 +64,14 @@ th {
   border-bottom: 1px solid #e2e8f0;
   padding: 0.9rem 1rem;
   vertical-align: top;
+}
+
+tbody tr {
+  transition: background-color 150ms ease;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
 }
 
 tr:last-child td {
@@ -55,4 +84,19 @@ tr:last-child td {
 
 .focus-ring:focus-visible {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.28);
+}
+
+@media (max-width: 639px) {
+  th {
+    font-size: 0.625rem;
+  }
+
+  td,
+  th {
+    padding: 0.75rem;
+  }
+
+  table {
+    min-width: 34rem;
+  }
 }

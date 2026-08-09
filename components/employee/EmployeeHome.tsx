@@ -1,6 +1,14 @@
 "use client";
 
-import { Plus, Search } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleDotDashed,
+  ListChecks,
+  Plus,
+  Search,
+  TrendingUp,
+  type LucideIcon
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
@@ -34,6 +42,13 @@ export function EmployeeHome({
   useEffect(() => {
     setRows(customers);
   }, [customers]);
+
+  const newLeads = rows.filter((customer) => customer.leadProcess.status === "NEW_LEAD").length;
+  const inProgress = rows.filter((customer) => customer.leadProcess.status === "IN_PROGRESS").length;
+  const completed = rows.filter((customer) => customer.leadProcess.status === "COMPLETED").length;
+  const completedIncome = rows
+    .filter((customer) => customer.leadProcess.status === "COMPLETED")
+    .reduce((total, customer) => total + customer.leadProcess.income, 0);
 
   function submitFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,11 +96,18 @@ export function EmployeeHome({
     <div className="min-h-screen bg-calm-50">
       <AppNavbar user={user} />
 
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-lg border border-brand-100 bg-white shadow-sm">
+      <main className="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:space-y-6 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
+        <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <LeadMetric icon={ListChecks} label="Total Leads" value={rows.length} />
+          <LeadMetric icon={CircleDotDashed} label="Open Leads" value={inProgress + newLeads} />
+          <LeadMetric icon={CheckCircle2} label="Completed" value={completed} />
+          <LeadMetric icon={TrendingUp} label="Completed Income" value={formatCurrency(completedIncome)} />
+        </section>
+
+        <section className="relative overflow-hidden rounded-lg border border-brand-100 bg-white shadow-panel">
           <Image
             alt="Active company poster"
-            className="h-48 w-full object-cover sm:h-64"
+            className="h-44 w-full object-cover sm:h-64 lg:h-72"
             height={420}
             priority
             src={posterUrl}
@@ -95,7 +117,7 @@ export function EmployeeHome({
 
         <Card>
           <CardHeader title="Search Filters" />
-          <form className="grid gap-4 p-5 md:grid-cols-[1fr_1fr_220px_auto]" onSubmit={submitFilters}>
+          <form className="grid gap-4 p-4 sm:p-5 md:grid-cols-[1fr_1fr_220px_auto]" onSubmit={submitFilters}>
             <Field label="Customer Name">
               <Input
                 defaultValue={searchParams.get("name") ?? ""}
@@ -122,10 +144,30 @@ export function EmployeeHome({
           </form>
         </Card>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(380px,0.65fr)]">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(380px,0.65fr)] xl:gap-6">
           <Card>
-            <CardHeader title="Customers" />
-            <div className="overflow-x-auto">
+            <CardHeader title={`Customers (${rows.length})`} />
+            <div className="divide-y divide-calm-200 md:hidden">
+              {rows.length ? (
+                rows.map((customer) => (
+                  <article className="space-y-3 p-4" key={customer.id}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-bold text-calm-900">{customer.customerName}</p>
+                        <p className="mt-1 text-sm font-medium text-calm-500">{customer.mobile}</p>
+                      </div>
+                      <span className="shrink-0 rounded-md bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-700">
+                        {customer.product}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-calm-600">Added {formatDate(customer.date)}</p>
+                  </article>
+                ))
+              ) : (
+                <EmptyMobile message="No customers match the selected filters." />
+              )}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
               <table>
                 <thead>
                   <tr>
@@ -159,7 +201,50 @@ export function EmployeeHome({
 
           <Card>
             <CardHeader title="Work Process" />
-            <div className="overflow-x-auto">
+            <div className="divide-y divide-calm-200 md:hidden">
+              {rows.length ? (
+                rows.map((customer) => (
+                  <article className="space-y-3 p-4" key={customer.id}>
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="min-w-0 truncate font-bold text-calm-900">{customer.customerName}</p>
+                      <Badge value={customer.leadProcess.status} />
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between text-xs font-bold text-calm-500">
+                        <span>Progress</span>
+                        <span>{customer.leadProcess.progress}%</span>
+                      </div>
+                      <div className="mt-2 h-2 rounded-full bg-calm-100">
+                        <div
+                          className="h-2 rounded-full bg-brand-500 transition-[width] duration-300"
+                          style={{ width: `${customer.leadProcess.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-xs font-bold uppercase text-calm-500">Income</p>
+                        <p className="mt-1 font-bold text-calm-900">{formatCurrency(customer.leadProcess.income)}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase text-calm-500">Complete</p>
+                        <p className="mt-1 font-bold text-calm-900">
+                          {customer.leadProcess.status === "COMPLETED" ? "Yes" : "No"}
+                        </p>
+                      </div>
+                    </div>
+                    {customer.leadProcess.rejectionReason ? (
+                      <p className="rounded-md bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
+                        {customer.leadProcess.rejectionReason}
+                      </p>
+                    ) : null}
+                  </article>
+                ))
+              ) : (
+                <EmptyMobile message="Work status appears after a customer is added." />
+              )}
+            </div>
+            <div className="hidden overflow-x-auto md:block">
               <table>
                 <thead>
                   <tr>
@@ -215,7 +300,7 @@ export function EmployeeHome({
 
       <Button
         aria-label="Add customer"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full px-0 shadow-soft"
+        className="fixed bottom-5 right-5 h-14 w-14 rounded-full px-0 shadow-soft sm:bottom-6 sm:right-6"
         type="button"
         onClick={() => setModalOpen(true)}
       >
@@ -255,4 +340,30 @@ export function EmployeeHome({
       </Modal>
     </div>
   );
+}
+
+function LeadMetric({
+  label,
+  value,
+  icon: Icon
+}: {
+  label: string;
+  value: string | number;
+  icon: LucideIcon;
+}) {
+  return (
+    <div className="flex min-h-24 items-center gap-3 rounded-lg border border-calm-200 bg-white p-4 shadow-sm">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-700">
+        <Icon size={20} />
+      </span>
+      <div className="min-w-0">
+        <p className="truncate text-xs font-bold uppercase text-calm-500">{label}</p>
+        <p className="mt-1 truncate text-xl font-black text-calm-900">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function EmptyMobile({ message }: { message: string }) {
+  return <p className="p-4 text-sm font-medium text-calm-500">{message}</p>;
 }

@@ -18,6 +18,15 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required").max(128, "Password is too long")
 });
 
+export const selfSignupSchema = z.object({
+  employeeId: requiredText("Employee ID", 3).max(32),
+  name: requiredText("Name", 2),
+  mobile: z.string().trim().regex(/^[0-9+\-\s]{7,18}$/, "Enter a valid mobile number"),
+  email: z.string().trim().email("Enter a valid email").optional().or(z.literal("")).default(""),
+  state: z.string().trim().max(120, "State is too long").optional().default(""),
+  password: strongPassword
+});
+
 export const customerCreateSchema = z.object({
   customerName: requiredText("Customer name", 2),
   mobile: z.string().trim().regex(/^[0-9+\-\s]{7,18}$/, "Enter a valid mobile number"),

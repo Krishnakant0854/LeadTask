@@ -1,6 +1,7 @@
 "use client";
 
 import { Eye, EyeOff, LockKeyhole, UserCheck } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -52,7 +53,7 @@ export function LoginForm() {
         </div>
         <h1 className="text-2xl font-black text-calm-900">LeadTask</h1>
         <p className="text-sm leading-6 text-calm-500">
-          Sign in with the employee details created by the admin.
+          Sign in with your employee ID, name, and password.
         </p>
       </div>
 
@@ -95,6 +96,13 @@ export function LoginForm() {
         <LockKeyhole size={18} />
         {busy ? "Checking..." : "Login"}
       </Button>
+
+      <p className="text-center text-sm font-medium text-calm-500">
+        New employee?{" "}
+        <Link className="font-bold text-brand-700 hover:text-brand-800" href="/signup">
+          Create an account
+        </Link>
+      </p>
     </form>
   );
 }

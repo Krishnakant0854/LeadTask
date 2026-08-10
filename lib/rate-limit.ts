@@ -7,6 +7,9 @@ import { prisma } from "@/lib/prisma";
 const MAX_FAILED_ATTEMPTS = readPositiveInt(process.env.LOGIN_MAX_FAILED_ATTEMPTS, 5);
 const LOCKOUT_MINUTES = readPositiveInt(process.env.LOGIN_LOCKOUT_MINUTES, 15);
 const WINDOW_MINUTES = readPositiveInt(process.env.LOGIN_WINDOW_MINUTES, 15);
+const SIGNUP_MAX_ATTEMPTS = readPositiveInt(process.env.SIGNUP_MAX_ATTEMPTS, 20);
+const SIGNUP_LOCKOUT_MINUTES = readPositiveInt(process.env.SIGNUP_LOCKOUT_MINUTES, 30);
+const SIGNUP_WINDOW_MINUTES = readPositiveInt(process.env.SIGNUP_WINDOW_MINUTES, 15);
 
 export async function assertLoginAllowed(employeeId: string, request: Request) {
   const key = loginAttemptKey(employeeId, request);
@@ -60,8 +63,58 @@ export async function clearFailedLogins(employeeId: string, request: Request) {
   });
 }
 
+export async function assertSignupAllowed(request: Request) {
+  const key = signupAttemptKey(request);
+  const attempt = await prisma.loginAttempt.findUnique({ where: { key } });
+  const now = new Date();
+
+  if (attempt?.lockedUntil && attempt.lockedUntil > now) {
+    const minutes = Math.max(1, Math.ceil((attempt.lockedUntil.getTime() - now.getTime()) / 60000));
+    throw Object.assign(
+      new Error(`Too many sign-up attempts. Try again after ${minutes} minutes.`),
+      { status: 429 }
+    );
+  }
+}
+
+export async function recordSignupAttempt(request: Request) {
+  const key = signupAttemptKey(request);
+  const ipHash = hashValue(clientIp(request));
+  const now = new Date();
+  const attempt = await prisma.loginAttempt.findUnique({ where: { key } });
+  const windowStart = new Date(now.getTime() - SIGNUP_WINDOW_MINUTES * 60 * 1000);
+  const currentAttempts = attempt && attempt.lastAttemptAt > windowStart ? attempt.attempts : 0;
+  const nextAttempts = currentAttempts + 1;
+  const lockedUntil =
+    nextAttempts >= SIGNUP_MAX_ATTEMPTS
+      ? new Date(now.getTime() + SIGNUP_LOCKOUT_MINUTES * 60 * 1000)
+      : null;
+
+  await prisma.loginAttempt.upsert({
+    where: { key },
+    update: {
+      attempts: nextAttempts,
+      ipHash,
+      lockedUntil,
+      lastAttemptAt: now
+    },
+    create: {
+      key,
+      employeeId: "__signup__",
+      ipHash,
+      attempts: nextAttempts,
+      lockedUntil,
+      lastAttemptAt: now
+    }
+  });
+}
+
 function loginAttemptKey(employeeId: string, request: Request) {
   return hashValue(`${normalizeEmployeeId(employeeId)}:${clientIp(request)}`);
+}
+
+function signupAttemptKey(request: Request) {
+  return hashValue(`signup:${clientIp(request)}`);
 }
 
 function clientIp(request: Request) {

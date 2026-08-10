@@ -16,6 +16,7 @@ export default async function AdminPostersPage() {
           ? {
               id: poster.id,
               imageUrl: poster.imageUrl,
+              linkUrl: poster.linkUrl,
               active: poster.active,
               createdAt: poster.createdAt.toISOString()
             }

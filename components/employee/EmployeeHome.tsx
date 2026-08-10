@@ -26,10 +26,12 @@ import type { CustomerRow, SessionUser } from "@/types/app";
 export function EmployeeHome({
   user,
   posterUrl,
+  posterLinkUrl,
   customers
 }: {
   user: SessionUser;
   posterUrl: string;
+  posterLinkUrl: string | null;
   customers: CustomerRow[];
 }) {
   const router = useRouter();
@@ -110,14 +112,20 @@ export function EmployeeHome({
         </section>
 
         <section className="relative overflow-hidden rounded-lg border border-brand-100 bg-white shadow-panel">
-          <Image
-            alt="Active company poster"
-            className="h-44 w-full object-cover sm:h-64 lg:h-72"
-            height={420}
-            priority
-            src={posterUrl}
-            width={1400}
-          />
+          {posterLinkUrl ? (
+            <a
+              aria-label="Open poster destination"
+              className="block focus-ring"
+              href={posterLinkUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+              title="Open poster destination"
+            >
+              <PosterImage posterUrl={posterUrl} clickable />
+            </a>
+          ) : (
+            <PosterImage posterUrl={posterUrl} />
+          )}
         </section>
 
         <Card>
@@ -292,6 +300,19 @@ export function EmployeeHome({
         </form>
       </Modal>
     </div>
+  );
+}
+
+function PosterImage({ posterUrl, clickable = false }: { posterUrl: string; clickable?: boolean }) {
+  return (
+    <Image
+      alt="Active company poster"
+      className={`h-44 w-full object-cover sm:h-64 lg:h-72${clickable ? " cursor-pointer transition duration-150 hover:opacity-95" : ""}`}
+      height={420}
+      priority
+      src={posterUrl}
+      width={1400}
+    />
   );
 }
 

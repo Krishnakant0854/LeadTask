@@ -57,5 +57,12 @@ export default async function HomePage({
     }
   }));
 
-  return <EmployeeHome customers={rows} posterUrl={poster?.imageUrl ?? "/poster-placeholder.svg"} user={sessionUser} />;
+  return (
+    <EmployeeHome
+      customers={rows}
+      posterLinkUrl={poster?.linkUrl ?? null}
+      posterUrl={poster?.imageUrl ?? "/poster-placeholder.svg"}
+      user={sessionUser}
+    />
+  );
 }

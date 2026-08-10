@@ -27,6 +27,14 @@ export const selfSignupSchema = z.object({
   password: strongPassword
 });
 
+export const posterLinkSchema = z
+  .string()
+  .trim()
+  .max(2048, "Poster link is too long")
+  .optional()
+  .default("")
+  .refine((value) => !value || isSafePosterLink(value), "Enter a valid HTTPS poster link");
+
 export const customerCreateSchema = z.object({
   customerName: requiredText("Customer name", 2),
   mobile: z.string().trim().regex(/^[0-9+\-\s]{7,18}$/, "Enter a valid mobile number"),
@@ -89,3 +97,11 @@ export const bonusRuleSchema = z.object({
   windowDays: z.coerce.number().int().min(1).max(31).default(2),
   active: z.boolean().default(true)
 });
+
+function isSafePosterLink(value: string) {
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}

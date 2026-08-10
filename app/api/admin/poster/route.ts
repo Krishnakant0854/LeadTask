@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { assertCsrf } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { isSafeImageUrl, saveUpload } from "@/lib/storage";
+import { posterLinkSchema } from "@/lib/validation";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -33,6 +34,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("poster");
     const imageUrlInput = String(formData.get("imageUrl") ?? "").trim();
+    const linkUrl = posterLinkSchema.parse(String(formData.get("linkUrl") ?? "")) || null;
 
     let imageUrl = imageUrlInput;
     if (file instanceof File && file.size > 0) {
@@ -56,6 +58,7 @@ export async function POST(request: Request) {
       return tx.poster.create({
         data: {
           imageUrl,
+          linkUrl,
           active: true
         }
       });

@@ -1,6 +1,6 @@
 "use client";
 
-import { ImagePlus } from "lucide-react";
+import { ExternalLink, ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 
@@ -13,6 +13,7 @@ import { formatDate } from "@/lib/utils";
 type Poster = {
   id: string;
   imageUrl: string;
+  linkUrl: string | null;
   active: boolean;
   createdAt: string;
 } | null;
@@ -63,6 +64,17 @@ export function PosterManager({ activePoster }: { activePoster: Poster }) {
           <p className="mt-3 text-sm font-semibold text-calm-500">
             {poster?.createdAt ? `Activated ${formatDate(poster.createdAt)}` : "Default poster is active"}
           </p>
+          {poster?.linkUrl ? (
+            <a
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 hover:text-brand-800"
+              href={poster.linkUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              View poster destination
+              <ExternalLink size={15} />
+            </a>
+          ) : null}
         </div>
       </Card>
 
@@ -74,6 +86,9 @@ export function PosterManager({ activePoster }: { activePoster: Poster }) {
           </Field>
           <Field label="Image URL">
             <Input name="imageUrl" placeholder="https://..." type="url" />
+          </Field>
+          <Field label="Poster Destination Link (optional)">
+            <Input name="linkUrl" placeholder="https://example.com" type="url" />
           </Field>
           {message ? <p className="text-sm font-semibold text-brand-700">{message}</p> : null}
           <Button disabled={busy} type="submit">

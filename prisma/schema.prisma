@@ -130,6 +130,7 @@ model BonusRule {
 model Poster {
   id        String   @id @default(cuid())
   imageUrl  String
+  linkUrl   String?
   active    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

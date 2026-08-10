@@ -25,11 +25,15 @@ import type { CustomerRow, SessionUser } from "@/types/app";
 
 export function EmployeeHome({
   user,
+  customerSupportUrl,
+  groupUrl,
   posterUrl,
   posterLinkUrl,
   customers
 }: {
   user: SessionUser;
+  customerSupportUrl: string | null;
+  groupUrl: string | null;
   posterUrl: string;
   posterLinkUrl: string | null;
   customers: CustomerRow[];
@@ -101,7 +105,7 @@ export function EmployeeHome({
 
   return (
     <div className="min-h-screen bg-calm-50">
-      <AppNavbar user={user} />
+      <AppNavbar customerSupportUrl={customerSupportUrl} groupUrl={groupUrl} user={user} />
 
       <main className="mx-auto max-w-7xl space-y-5 px-4 py-5 sm:space-y-6 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
         <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

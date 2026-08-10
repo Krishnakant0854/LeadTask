@@ -27,13 +27,12 @@ export const selfSignupSchema = z.object({
   password: strongPassword
 });
 
-export const posterLinkSchema = z
-  .string()
-  .trim()
-  .max(2048, "Poster link is too long")
-  .optional()
-  .default("")
-  .refine((value) => !value || isSafePosterLink(value), "Enter a valid HTTPS poster link");
+export const posterLinkSchema = optionalHttpsLink("Poster link");
+
+export const quickLinksSchema = z.object({
+  customerSupportUrl: optionalHttpsLink("Customer support link"),
+  groupUrl: optionalHttpsLink("Group link")
+});
 
 export const customerCreateSchema = z.object({
   customerName: requiredText("Customer name", 2),
@@ -98,7 +97,17 @@ export const bonusRuleSchema = z.object({
   active: z.boolean().default(true)
 });
 
-function isSafePosterLink(value: string) {
+function optionalHttpsLink(label: string) {
+  return z
+    .string()
+    .trim()
+    .max(2048, `${label} is too long`)
+    .optional()
+    .default("")
+    .refine((value) => !value || isSafeExternalLink(value), `Enter a valid HTTPS ${label.toLowerCase()}`);
+}
+
+function isSafeExternalLink(value: string) {
   try {
     return new URL(value).protocol === "https:";
   } catch {

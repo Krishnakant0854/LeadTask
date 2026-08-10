@@ -23,14 +23,18 @@ export default async function HomePage({
     if (typeof value === "string") params.set(key, value);
   }
 
-  const [poster, customers] = await Promise.all([
+  const [poster, customers, quickLinks] = await Promise.all([
     prisma.poster.findFirst({ where: { active: true }, orderBy: { createdAt: "desc" } }),
     prisma.customer.findMany({
       where: customerWhereFromSearch(params, { userId: user.id }),
       include: { leadProcess: true },
       orderBy: { createdAt: "desc" }
-    })
+    }),
+    prisma.quickLink.findMany({ select: { type: true, url: true } })
   ]);
+
+  const customerSupportUrl = quickLinks.find((link) => link.type === "CUSTOMER_SUPPORT")?.url ?? null;
+  const groupUrl = quickLinks.find((link) => link.type === "GROUP")?.url ?? null;
 
   const sessionUser: SessionUser = {
     id: user.id,
@@ -60,6 +64,8 @@ export default async function HomePage({
   return (
     <EmployeeHome
       customers={rows}
+      customerSupportUrl={customerSupportUrl}
+      groupUrl={groupUrl}
       posterLinkUrl={poster?.linkUrl ?? null}
       posterUrl={poster?.imageUrl ?? "/poster-placeholder.svg"}
       user={sessionUser}

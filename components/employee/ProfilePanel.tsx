@@ -23,11 +23,15 @@ type IncomeSummary = {
 
 export function ProfilePanel({
   user,
+  customerSupportUrl,
+  groupUrl,
   bank,
   income,
   withdrawals
 }: {
   user: SessionUser;
+  customerSupportUrl: string | null;
+  groupUrl: string | null;
   bank: BankDetails;
   income: IncomeSummary;
   withdrawals: WithdrawalRow[];
@@ -109,7 +113,7 @@ export function ProfilePanel({
 
   return (
     <div className="min-h-screen bg-calm-50">
-      <AppNavbar user={user} />
+      <AppNavbar customerSupportUrl={customerSupportUrl} groupUrl={groupUrl} user={user} />
 
       <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[360px_1fr] lg:px-8">
         <div className="space-y-6">

@@ -27,6 +27,11 @@ enum WithdrawalStatus {
   REJECTED
 }
 
+enum QuickLinkType {
+  CUSTOMER_SUPPORT
+  GROUP
+}
+
 model User {
   id           String       @id @default(cuid())
   employeeId   String       @unique
@@ -136,6 +141,14 @@ model Poster {
   updatedAt DateTime @updatedAt
 
   @@index([active])
+}
+
+model QuickLink {
+  id        String        @id @default(cuid())
+  type      QuickLinkType @unique
+  url       String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 }
 
 model Session {

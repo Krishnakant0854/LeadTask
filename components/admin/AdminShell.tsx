@@ -6,6 +6,7 @@ import {
   ContactRound,
   Gift,
   ImagePlus,
+  Link2,
   LogOut,
   UsersRound,
   WalletCards
@@ -26,6 +27,7 @@ const links = [
   { href: "/admin/leads", label: "Leads", icon: ClipboardList },
   { href: "/admin/bonus", label: "Bonus Rules", icon: Gift },
   { href: "/admin/posters", label: "Posters", icon: ImagePlus },
+  { href: "/admin/quick-links", label: "Quick Links", icon: Link2 },
   { href: "/admin/withdrawals", label: "Withdrawals", icon: WalletCards }
 ];
 

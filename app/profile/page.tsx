@@ -10,7 +10,7 @@ export const dynamic = "force-dynamic";
 export default async function ProfilePage() {
   const user = await requireUser();
 
-  const [bank, withdrawals, salesIncome, bonusSummary, withdrawn] = await Promise.all([
+  const [bank, withdrawals, salesIncome, bonusSummary, withdrawn, quickLinks] = await Promise.all([
     prisma.bankAccount.findUnique({ where: { userId: user.id } }),
     prisma.withdrawal.findMany({
       where: { userId: user.id },
@@ -30,8 +30,12 @@ export default async function ProfilePage() {
         status: { in: ["APPROVED", "PAID"] }
       },
       _sum: { amount: true }
-    })
+    }),
+    prisma.quickLink.findMany({ select: { type: true, url: true } })
   ]);
+
+  const customerSupportUrl = quickLinks.find((link) => link.type === "CUSTOMER_SUPPORT")?.url ?? null;
+  const groupUrl = quickLinks.find((link) => link.type === "GROUP")?.url ?? null;
 
   const sessionUser: SessionUser = {
     id: user.id,
@@ -75,6 +79,8 @@ export default async function ProfilePage() {
         withdrawn: paid,
         available: Math.max(total - paid, 0)
       }}
+      customerSupportUrl={customerSupportUrl}
+      groupUrl={groupUrl}
       user={sessionUser}
       withdrawals={withdrawalRows}
     />

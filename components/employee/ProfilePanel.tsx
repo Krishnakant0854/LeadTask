@@ -1,7 +1,8 @@
 "use client";
 
-import { Camera, CreditCard, WalletCards } from "lucide-react";
+import { ArrowLeft, Camera, CreditCard, WalletCards } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 
 import { AppNavbar } from "@/components/AppNavbar";
@@ -42,6 +43,8 @@ export function ProfilePanel({
   const [withdrawalRows, setWithdrawalRows] = useState(withdrawals);
   const [busy, setBusy] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
+  const returnHref = user.role === "ADMIN" ? "/admin/dashboard" : "/home";
+  const returnLabel = user.role === "ADMIN" ? "Back to Dashboard" : "Back to Home";
 
   async function uploadPhoto(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -115,8 +118,17 @@ export function ProfilePanel({
     <div className="min-h-screen bg-calm-50">
       <AppNavbar customerSupportUrl={customerSupportUrl} groupUrl={groupUrl} user={user} />
 
-      <main className="mx-auto grid max-w-7xl gap-6 px-4 py-6 sm:px-6 lg:grid-cols-[360px_1fr] lg:px-8">
-        <div className="space-y-6">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <Link
+          className="focus-ring mb-5 inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-bold text-calm-700 hover:bg-calm-100 hover:text-calm-900"
+          href={returnHref}
+        >
+          <ArrowLeft size={18} />
+          {returnLabel}
+        </Link>
+
+        <div className="grid gap-6 lg:grid-cols-[360px_1fr]">
+          <div className="space-y-6">
           <Card>
             <CardHeader title="Profile Photo" />
             <form className="space-y-4 p-5" onSubmit={uploadPhoto}>
@@ -155,7 +167,7 @@ export function ProfilePanel({
           </Card>
         </div>
 
-        <div className="space-y-6">
+          <div className="space-y-6">
           <Card>
             <CardHeader title="Bank Details" />
             <form className="grid gap-4 p-5 md:grid-cols-2" onSubmit={saveBank}>
@@ -229,6 +241,7 @@ export function ProfilePanel({
               </table>
             </div>
           </Card>
+          </div>
         </div>
       </main>
     </div>

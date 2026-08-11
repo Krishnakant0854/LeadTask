@@ -35,8 +35,13 @@ export async function POST(request: Request) {
     const file = formData.get("poster");
     const imageUrlInput = String(formData.get("imageUrl") ?? "").trim();
     const linkUrl = posterLinkSchema.parse(String(formData.get("linkUrl") ?? "")) || null;
+    const activePoster = await prisma.poster.findFirst({
+      where: { active: true },
+      orderBy: { createdAt: "desc" }
+    });
 
-    let imageUrl = imageUrlInput;
+    const hasReplacementImage = Boolean(imageUrlInput) || (file instanceof File && file.size > 0);
+    let imageUrl = imageUrlInput || activePoster?.imageUrl || "";
     if (file instanceof File && file.size > 0) {
       imageUrl = await saveUpload(file, "posters");
     }
@@ -51,6 +56,15 @@ export async function POST(request: Request) {
       throw Object.assign(new Error("Poster URL must be http, https, or a local path"), {
         status: 422
       });
+    }
+
+    if (!hasReplacementImage && activePoster) {
+      const poster = await prisma.poster.update({
+        where: { id: activePoster.id },
+        data: { linkUrl }
+      });
+
+      return ok({ poster });
     }
 
     const poster = await prisma.$transaction(async (tx) => {

@@ -88,8 +88,16 @@ export function PosterManager({ activePoster }: { activePoster: Poster }) {
             <Input name="imageUrl" placeholder="https://..." type="url" />
           </Field>
           <Field label="Poster Destination Link (optional)">
-            <Input name="linkUrl" placeholder="https://example.com" type="url" />
+            <Input
+              defaultValue={poster?.linkUrl ?? ""}
+              name="linkUrl"
+              placeholder="https://example.com"
+              type="url"
+            />
           </Field>
+          <p className="text-xs font-medium text-calm-500">
+            Leave both image fields empty to update only the current poster link.
+          </p>
           {message ? <p className="text-sm font-semibold text-brand-700">{message}</p> : null}
           <Button disabled={busy} type="submit">
             <ImagePlus size={17} />

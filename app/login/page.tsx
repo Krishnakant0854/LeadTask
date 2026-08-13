@@ -1,8 +1,17 @@
 import { LoginForm } from "@/components/LoginForm";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const customerSupportUrl = await prisma.quickLink
+    .findUnique({
+      where: { type: "CUSTOMER_SUPPORT" },
+      select: { url: true }
+    })
+    .then((link) => link?.url ?? null)
+    .catch(() => null);
+
   return (
     <main className="min-h-screen bg-calm-50">
       <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_500px]">
@@ -27,7 +36,7 @@ export default function LoginPage() {
               </span>
               <span className="text-lg font-black text-calm-900">LeadTask</span>
             </div>
-            <LoginForm />
+            <LoginForm customerSupportUrl={customerSupportUrl} />
           </div>
         </section>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, LockKeyhole, UserCheck } from "lucide-react";
+import { Eye, EyeOff, Headset, LockKeyhole, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { csrfFetch } from "@/lib/client/csrf";
 
-export function LoginForm() {
+export function LoginForm({ customerSupportUrl = null }: { customerSupportUrl?: string | null }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState("");
@@ -46,15 +46,29 @@ export function LoginForm() {
 
   return (
     <form className="space-y-5" onSubmit={submit}>
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sm font-bold text-brand-700">
-          <UserCheck size={18} />
-          Secure staff login
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm font-bold text-brand-700">
+            <UserCheck size={18} />
+            Secure staff login
+          </div>
+          <h1 className="text-2xl font-black text-calm-900">LeadTask</h1>
+          <p className="text-sm leading-6 text-calm-500">
+            Sign in with your employee ID, name, and password.
+          </p>
         </div>
-        <h1 className="text-2xl font-black text-calm-900">LeadTask</h1>
-        <p className="text-sm leading-6 text-calm-500">
-          Sign in with your employee ID, name, and password.
-        </p>
+        {customerSupportUrl ? (
+          <a
+            aria-label="Customer Support"
+            className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-calm-700 hover:bg-calm-100"
+            href={customerSupportUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+            title="Customer Support"
+          >
+            <Headset size={20} />
+          </a>
+        ) : null}
       </div>
 
       <Field label="Employee ID">

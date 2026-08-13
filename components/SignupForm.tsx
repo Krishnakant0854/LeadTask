@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, EyeOff, LockKeyhole, UserPlus } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Headset, LockKeyhole, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/input";
 import { csrfFetch } from "@/lib/client/csrf";
 
-export function SignupForm() {
+export function SignupForm({ customerSupportUrl = null }: { customerSupportUrl?: string | null }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [issuedEmployeeId, setIssuedEmployeeId] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,7 +34,6 @@ export function SignupForm() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        employeeId: form.get("employeeId"),
         name: form.get("name"),
         mobile: form.get("mobile"),
         email: form.get("email"),
@@ -50,23 +50,74 @@ export function SignupForm() {
       return;
     }
 
-    router.push("/home");
+    const data = (await response.json()) as { user: { employeeId: string } };
+    setIssuedEmployeeId(data.user.employeeId);
+  }
+
+  if (issuedEmployeeId) {
+    return (
+      <div className="space-y-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm font-bold text-emerald-700">
+            <CheckCircle2 size={18} />
+            Registration complete
+          </div>
+          {customerSupportUrl ? (
+            <a
+              aria-label="Customer Support"
+              className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-calm-700 hover:bg-calm-100"
+              href={customerSupportUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+              title="Customer Support"
+            >
+              <Headset size={20} />
+            </a>
+          ) : null}
+        </div>
+        <div>
+          <h1 className="text-2xl font-black text-calm-900">Your Employee ID</h1>
+          <p className="mt-2 text-sm leading-6 text-calm-500">Use this ID with your name and password whenever you log in.</p>
+        </div>
+        <div className="rounded-md border border-brand-200 bg-brand-50 px-4 py-3">
+          <p className="text-xs font-bold uppercase text-brand-700">System-issued Employee ID</p>
+          <p className="mt-1 break-all text-xl font-black text-brand-900">{issuedEmployeeId}</p>
+        </div>
+        <Button className="w-full" type="button" onClick={() => router.push("/home")}>
+          Continue to Home
+        </Button>
+      </div>
+    );
   }
 
   return (
     <form className="space-y-5" onSubmit={submit}>
-      <div className="space-y-1">
-        <div className="flex items-center gap-2 text-sm font-bold text-brand-700">
-          <UserPlus size={18} />
-          Employee registration
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm font-bold text-brand-700">
+            <UserPlus size={18} />
+            Employee registration
+          </div>
+          <h1 className="text-2xl font-black text-calm-900">Create account</h1>
+          <p className="text-sm leading-6 text-calm-500">Your Employee ID is generated securely by the system.</p>
         </div>
-        <h1 className="text-2xl font-black text-calm-900">Create account</h1>
-        <p className="text-sm leading-6 text-calm-500">Your account will be created as an employee account.</p>
+        {customerSupportUrl ? (
+          <a
+            aria-label="Customer Support"
+            className="focus-ring flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-calm-700 hover:bg-calm-100"
+            href={customerSupportUrl}
+            rel="noopener noreferrer"
+            target="_blank"
+            title="Customer Support"
+          >
+            <Headset size={20} />
+          </a>
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Employee ID">
-          <Input autoComplete="username" name="employeeId" placeholder="EMP001" required />
+          <Input disabled value="Issued automatically after signup" />
         </Field>
         <Field label="Full Name">
           <Input autoComplete="name" name="name" placeholder="Rahul Sharma" required />

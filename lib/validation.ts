@@ -3,6 +3,8 @@ import { z } from "zod";
 const requiredText = (label: string, min = 2) =>
   z.string().trim().min(min, `${label} is required`).max(120, `${label} is too long`);
 
+const employeeIdSchema = requiredText("Employee ID", 3).max(32);
+
 const strongPassword = z
   .string()
   .min(12, "Password must be at least 12 characters")
@@ -13,13 +15,12 @@ const strongPassword = z
   .regex(/[^A-Za-z0-9]/, "Password must include a special character");
 
 export const loginSchema = z.object({
-  employeeId: requiredText("Employee ID", 3).max(32),
+  employeeId: employeeIdSchema,
   name: requiredText("Name", 2),
   password: z.string().min(1, "Password is required").max(128, "Password is too long")
 });
 
 export const selfSignupSchema = z.object({
-  employeeId: requiredText("Employee ID", 3).max(32),
   name: requiredText("Name", 2),
   mobile: z.string().trim().regex(/^[0-9+\-\s]{7,18}$/, "Enter a valid mobile number"),
   email: z.string().trim().email("Enter a valid email").optional().or(z.literal("")).default(""),
@@ -56,7 +57,7 @@ export const bankSchema = z.object({
 });
 
 export const adminUserCreateSchema = z.object({
-  employeeId: requiredText("Employee ID", 3).max(32),
+  employeeId: employeeIdSchema,
   name: requiredText("Name", 2),
   password: strongPassword,
   mobile: z.string().trim().optional().default(""),
@@ -66,7 +67,7 @@ export const adminUserCreateSchema = z.object({
 });
 
 export const adminUserUpdateSchema = z.object({
-  employeeId: requiredText("Employee ID", 3).max(32).optional(),
+  employeeId: employeeIdSchema.optional(),
   name: requiredText("Name", 2).optional(),
   mobile: z.string().trim().optional().default(""),
   email: z.string().trim().email("Enter a valid email").optional().or(z.literal("")).default(""),

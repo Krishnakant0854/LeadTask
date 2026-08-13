@@ -1,6 +1,7 @@
+import { randomBytes } from "crypto";
 import { Prisma } from "@prisma/client";
 
-import { fail, ok, routeError } from "@/lib/api";
+import { ok, routeError } from "@/lib/api";
 import { createSession } from "@/lib/auth";
 import { assertCsrf } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
@@ -18,17 +19,33 @@ export async function POST(request: Request) {
     await assertSignupAllowed(request);
     await recordSignupAttempt(request);
 
-    const user = await prisma.user.create({
-      data: {
-        employeeId: body.employeeId,
-        name: body.name,
-        passwordHash: await hashPassword(body.password),
-        role: "EMPLOYEE",
-        mobile: body.mobile,
-        email: body.email || null,
-        state: body.state || null
+    const passwordHash = await hashPassword(body.password);
+    let user = null;
+
+    // The employee ID is generated exclusively on the server. The client never submits it.
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        user = await prisma.user.create({
+          data: {
+            employeeId: createEmployeeId(),
+            name: body.name,
+            passwordHash,
+            role: "EMPLOYEE",
+            mobile: body.mobile,
+            email: body.email || null,
+            state: body.state || null
+          }
+        });
+        break;
+      } catch (error) {
+        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") continue;
+        throw error;
       }
-    });
+    }
+
+    if (!user) {
+      throw Object.assign(new Error("Unable to issue an Employee ID. Please try again."), { status: 503 });
+    }
 
     await createSession(user.id);
 
@@ -42,10 +59,10 @@ export async function POST(request: Request) {
       redirectTo: "/home"
     }, { status: 201 });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
-      return fail("This Employee ID is already registered", 409);
-    }
-
     return routeError(error);
   }
+}
+
+function createEmployeeId() {
+  return `EMP-${randomBytes(5).toString("hex").toUpperCase()}`;
 }
